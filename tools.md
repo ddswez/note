@@ -25,3 +25,5 @@
 
 [Android 内存泄漏全解](<https://juejin.im/entry/57c966b05bbb500074e1d4a4>)
 
+[关于硬件加速的那么点儿东西](<https://www.jianshu.com/p/9cd7097a4fcf>)
+
