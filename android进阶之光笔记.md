@@ -61,11 +61,7 @@
 
    
 
-   
-
    ```java
-   
-   
    public boolean dispatchTouchEvent(MotionEvent event) {
    		if (mOnTouchListener != null && (mViewFlags & ENABLED_MASK) == ENABLED && 		             mOnTouchListener.onTouch(this, event)) {
    			return true;//不会继续向下分发.     结论一: dispatchTouchEvent()返回true, 直接中断消息.
@@ -92,7 +88,7 @@
 * onTouchEvent()源码:
 
   
-  			
+  ​			
   ```java
   onTouchEvent(event){
   		........
@@ -170,7 +166,6 @@
     	return super.dispatchTouchEvent(event);//FrameLayout.dispatchTouchEvent
     }
     ```
-    
 
   * 至此我们已经至少明白了以下几点:
     1、我们可以重载Activity的onUserInteraction方法，在Down事件触发传递前，
@@ -191,136 +186,146 @@
     
 
 
-    ​	
-    ```java
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-    	final int action = ev.getAction();//获取事件
-    	final float xf = ev.getX();//获取触摸坐标
-    	final float yf = ev.getY();
-    	final float scrolledXFloat = xf + mScrollX;//将布局坐标转化成视图坐标(获取偏移的偏移量), ViewGroup只接受视图坐标, 不接受布局坐标.
-    	final float scrolledYFloat = yf + mScrollY;
-    	final Rect frame = mTempRect;    //当前ViewGroup的视图矩阵
-    
-        boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;//是否禁止拦截
-    
-    if (action == MotionEvent.ACTION_DOWN) {//如果事件是按下事件
-    	if (mMotionTarget != null) {    //判断接受事件的target是否为空
-    		//不为空肯定是不正常的，因为一个事件是由DOWN开始的，而DOWN还没有被消费，所以目标也不是不可能被确定，
-    		//造成这个的原因可能是在上一次up事件或者cancel事件的时候，没有把目标赋值为空
-    		mMotionTarget = null;    //在此处挽救
-    	}
-    	//不允许拦截，或者onInterceptTouchEvent返回false，也就是不拦截。注意，这个判断都是在DOWN事件中判断
-    	if (disallowIntercept || !onInterceptTouchEvent(ev)) {
-    		//从新设置一下事件为DOWN事件，其实没有必要，这只是一种保护错误，防止被篡改了
-    		ev.setAction(MotionEvent.ACTION_DOWN);
-    		//开始寻找能响应该事件的子View
-    		final int scrolledXInt = (int) scrolledXFloat;
-    		final int scrolledYInt = (int) scrolledYFloat;
-    		final View[] children = mChildren;
-    		final int count = mChildrenCount;
-    		for (int i = count - 1; i >= 0; i--) {//添加顺序是从父类到子类, 在此取出顺序是相反的
-    			final View child = children[i]; 
-    			if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE
-    					|| child.getAnimation() != null) {//如果child可见，或者有动画，获取该child的矩阵
-    				child.getHitRect(frame);//获取当前孩子在视图矩阵的位置
-    				if (frame.contains(scrolledXInt, scrolledYInt)) {//判断当前手指是否落在指定区域
-    					// 设置系统坐标
-    					final float xc = scrolledXFloat - child.mLeft;//把视图坐标转化成布局坐标
-    					final float yc = scrolledYFloat - child.mTop;
-    					ev.setLocation(xc, yc);
-    					if (child.dispatchTouchEvent(ev))  {//最终都是走View的dispatchTouchEvent方法
-    									    //(判断child是View还是ViewGroup. 如果child是view, 则会走View中
-    									    //的dispatchTouchEvent方法.如果是ViewGroup, 则返回重新走一遍)
-    						//如果消费了，目标就确定了，以便接下来的事件都传递给child
-    						mMotionTarget = child;
-    						return true;    //事件消费了，返回true
-    					}
-    				}
-    			}
-    		}
-    		//能到这里来，证明所有的子View都没消费掉Down事件，那么留给下面的逻辑进行处理
-    	}
-    }
-    //判断是不是up或者cancel事件
-    boolean isUpOrCancel = (action == MotionEvent.ACTION_UP) ||
-    		(action == MotionEvent.ACTION_CANCEL);
-    
-    if (isUpOrCancel) {
-    	//如果是取消，把禁止拦截这个标志位给取消
-    	mGroupFlags &= ~FLAG_DISALLOW_INTERCEPT; 
-    }
-    final View target = mMotionTarget;
-    if (target == null) {
-    	//判断该值是否为空(在此一定为空, 否则在down事件中就返回了)，如果为空，则没找到能响应的子View，那么直接调用父类的dispatchTouchEvent.
-    	ev.setLocation(xf, yf);
-    	return super.dispatchTouchEvent(ev);
-    }
-    
-    //代码执行到这里, 说明有问题了
-    //能走到这里来，说明已经有target，那也说明，这里不是DOWN事件，因为DOWN事件如果有target，已经在前面返回了，执行不到这里
-    if (!disallowIntercept && onInterceptTouchEvent(ev)) {//如果有目标，又非要拦截，子View只能傻傻的等着, 所以给目标发送一个cancel事件
-    	final float xc = scrolledXFloat - (float) target.mLeft;
-    	final float yc = scrolledYFloat - (float) target.mTop;
-    	ev.setAction(MotionEvent.ACTION_CANCEL);//该为cancel
-    	ev.setLocation(xc, yc);
-    	if (!target.dispatchTouchEvent(ev)) {
-    		//调用子View的dispatchTouchEvent，就算它没有消费这个cancel事件，我们也无能为力了。
-    	}
-    	//清除目标
-    	mMotionTarget = null;
-    	//有目标，又拦截，自身也享受不了了，因为一个事件应该由一个View去完成
-    	return true;//直接返回true，以完成这次事件，好让系统开始派发下一次
-    }
-    
-    if (isUpOrCancel) {//取消或者UP的话，把目标赋值为空，以便下一次DOWN能重新找，此处就算不赋值，下一次DOWN也会先把它赋值为空
-    	mMotionTarget = null;
-    }
-    
-    //又不拦截，又有目标，那么就直接调用目标的dispatchTouchEvent
-    final float xc = scrolledXFloat - (float) target.mLeft;
-    final float yc = scrolledYFloat - (float) target.mTop;
-    ev.setLocation(xc, yc);
-    
-    return target.dispatchTouchEvent(ev);
-    //也就是说，如果是DOWN事件，拦截了，那么每次一次MOVE或者UP都不会再判断是否拦截，直接调用super的dispatchTouchEvent
-    //如果DOWN没拦截，就是有其他View处理了DOWN事件，那么接下来的MOVE或者UP事件拦截了，那么给目标View发送一个cancel事件，告诉它touch被取消了，并且自身也不会处理，直接返回true
-    //这是为了不违背一个Touch事件只能由一个View处理的原则。
-    }
-    ```
-    
+```java
 
-    再来看看View中的dispatchTouchEvent是如何分发事件的：
+public boolean dispatchTouchEvent(MotionEvent ev) {
+	final int action = ev.getAction();//获取事件
+	final float xf = ev.getX();//获取触摸坐标
+	final float yf = ev.getY();
+	final float scrolledXFloat = xf + mScrollX;//将布局坐标转化成视图坐标(获取偏移的偏移量), ViewGroup只接受视图坐标, 不接受布局坐标.
+	final float scrolledYFloat = yf + mScrollY;
+	final Rect frame = mTempRect;    //当前ViewGroup的视图矩阵
 
-    ```java
-    public boolean dispatchTouchEvent(MotionEvent event) {
-    	if (mOnTouchListener != null && (mViewFlags & ENABLED_MASK) == ENABLED &&
-    			mOnTouchListener.onTouch(this, event)) {
-    		//判断mOnTouchListener是否存在，并且控件可点的情况下，执行onTouch，如果onTouch返回true，就消耗该事件
-    		return true;
-    	}
-    	//如果以上条件都不成立，则把事件交给onTouchEvent来处理
-    	return onTouchEvent(event);
-    }
-    ```
+    boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;//是否禁止拦截
 
+if (action == MotionEvent.ACTION_DOWN) {//如果事件是按下事件
+	if (mMotionTarget != null) {    //判断接受事件的target是否为空
+		//不为空肯定是不正常的，因为一个事件是由DOWN开始的，而DOWN还没有被消费，所以目标也不是不可能被确定，
+		//造成这个的原因可能是在上一次up事件或者cancel事件的时候，没有把目标赋值为空
+		mMotionTarget = null;    //在此处挽救
+	}
+	//不允许拦截，或者onInterceptTouchEvent返回false，也就是不拦截。注意，这个判断都是在DOWN事件中判断
+	if (disallowIntercept || !onInterceptTouchEvent(ev)) {
+		//从新设置一下事件为DOWN事件，其实没有必要，这只是一种保护错误，防止被篡改了
+		ev.setAction(MotionEvent.ACTION_DOWN);
+		//开始寻找能响应该事件的子View
+		final int scrolledXInt = (int) scrolledXFloat;
+		final int scrolledYInt = (int) scrolledYFloat;
+		final View[] children = mChildren;
+		final int count = mChildrenCount;
+		for (int i = count - 1; i >= 0; i--) {//添加顺序是从父类到子类, 在此取出顺序是相反的
+			final View child = children[i]; 
+			if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE
+					|| child.getAnimation() != null) {//如果child可见，或者有动画，获取该child的矩阵
+				child.getHitRect(frame);//获取当前孩子在视图矩阵的位置
+				if (frame.contains(scrolledXInt, scrolledYInt)) {//判断当前手指是否落在指定区域
+					// 设置系统坐标
+					final float xc = scrolledXFloat - child.mLeft;//把视图坐标转化成布局坐标
+					final float yc = scrolledYFloat - child.mTop;
+					ev.setLocation(xc, yc);
+					if (child.dispatchTouchEvent(ev))  {//最终都是走View的dispatchTouchEvent方法
+									    //(判断child是View还是ViewGroup. 如果child是view, 则会走View中
+									    //的dispatchTouchEvent方法.如果是ViewGroup, 则返回重新走一遍)
+						//如果消费了，目标就确定了，以便接下来的事件都传递给child
+						mMotionTarget = child;
+						return true;    //事件消费了，返回true
+					}
+				}
+			}
+		}
+		//能到这里来，证明所有的子View都没消费掉Down事件，那么留给下面的逻辑进行处理
+	}
+}
+//判断是不是up或者cancel事件
+boolean isUpOrCancel = (action == MotionEvent.ACTION_UP) ||
+		(action == MotionEvent.ACTION_CANCEL);
 
-    View中的处理相当简单明了，因为不涉及到子View，所以只在自身内部进行分发。
-    首先判断是否设置了触摸监听，并且可以响应事件，就交由监听的onTouch处理。
-    如果上述条件不成立，或者监听的onTouch事件没有消费掉该事件，则交由onTouchEvent进行处理，并把返回结果交给上层。
+if (isUpOrCancel) {
+	//如果是取消，把禁止拦截这个标志位给取消
+	mGroupFlags &= ~FLAG_DISALLOW_INTERCEPT; 
+}
+final View target = mMotionTarget;
+if (target == null) {
+	//判断该值是否为空(在此一定为空, 否则在down事件中就返回了)，如果为空，则没找到能响应的子View，那么直接调用父类的dispatchTouchEvent.
+	ev.setLocation(xf, yf);
+	return super.dispatchTouchEvent(ev);
+}
+
+//代码执行到这里, 说明有问题了
+//能走到这里来，说明已经有target，那也说明，这里不是DOWN事件，因为DOWN事件如果有target，已经在前面返回了，执行不到这里
+if (!disallowIntercept && onInterceptTouchEvent(ev)) {//如果有目标，又非要拦截，子View只能傻傻的等着, 所以给目标发送一个cancel事件
+	final float xc = scrolledXFloat - (float) target.mLeft;
+	final float yc = scrolledYFloat - (float) target.mTop;
+	ev.setAction(MotionEvent.ACTION_CANCEL);//该为cancel
+	ev.setLocation(xc, yc);
+	if (!target.dispatchTouchEvent(ev)) {
+		//调用子View的dispatchTouchEvent，就算它没有消费这个cancel事件，我们也无能为力了。
+	}
+	//清除目标
+	mMotionTarget = null;
+	//有目标，又拦截，自身也享受不了了，因为一个事件应该由一个View去完成
+	return true;//直接返回true，以完成这次事件，好让系统开始派发下一次
+}
+
+if (isUpOrCancel) {//取消或者UP的话，把目标赋值为空，以便下一次DOWN能重新找，此处就算不赋值，下一次DOWN也会先把它赋值为空
+	mMotionTarget = null;
+}
+
+//又不拦截，又有目标，那么就直接调用目标的dispatchTouchEvent
+final float xc = scrolledXFloat - (float) target.mLeft;
+final float yc = scrolledYFloat - (float) target.mTop;
+ev.setLocation(xc, yc);
+
+return target.dispatchTouchEvent(ev);
+//也就是说，如果是DOWN事件，拦截了，那么每次一次MOVE或者UP都不会再判断是否拦截，直接调用super的dispatchTouchEvent
+//如果DOWN没拦截，就是有其他View处理了DOWN事件，那么接下来的MOVE或者UP事件拦截了，那么给目标View发送一个cancel事件，告诉它touch被取消了，并且自身也不会处理，直接返回true
+//这是为了不违背一个Touch事件只能由一个View处理的原则。
+}
+```
 
 
 
 
 
+再来看看View中的dispatchTouchEvent是如何分发事件的：
+
+```java
+public boolean dispatchTouchEvent(MotionEvent event) {
+	if (mOnTouchListener != null && (mViewFlags & ENABLED_MASK) == ENABLED &&
+			mOnTouchListener.onTouch(this, event)) {
+		//判断mOnTouchListener是否存在，并且控件可点的情况下，执行onTouch，如果onTouch返回true，就消耗该事件
+		return true;
+	}
+	//如果以上条件都不成立，则把事件交给onTouchEvent来处理
+	return onTouchEvent(event);
+}
+```
+
+View中的处理相当简单明了，因为不涉及到子View，所以只在自身内部进行分发。
+首先判断是否设置了触摸监听，并且可以响应事件，就交由监听的onTouch处理。
+如果上述条件不成立，或者监听的onTouch事件没有消费掉该事件，则交由onTouchEvent进行处理，并把返回结果交给上层。
 
 
 
 
 
+### 四.多线程编程
+
+#### AsyncTask源码分析
 
 
 
+### 五. 网络编程与网络框架
 
+#### 网络分层
+
+物理层 数据链路层 网络层 传输层 应用层 
+
+#### TCP的三次握手和四次握手
+
+#### Http协议原理
+
+* Http请求报文由 请求行, 请求报头, 空行和请求数据4个部分组成
 
 
 
