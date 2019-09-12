@@ -7,6 +7,20 @@
 
 ​       [文档地址](http://wproxy.org/whistle/)
 
+- 匹配response中某一字符替换  用于同一个url请求多个接口, 根据请求头中字段不同返回不同数据
+
+  1. rules: https://www.xxx.com/v1/abce resReplace://{ticker.json}
+  2. values: 正则匹配请求的resposne包含字符串 "test"
+
+  /.\*?test.\*/:  {"result":[{"result":{"a":7.15,"b":7.17,"c":1,"d":100,"e":10000,"f":5,"g":0,"test":0}}]}
+
+  3. 根据想获取的数据修改在values中的字符串
+
+- 直接替换请求response 用于一个url请求一个接口
+
+  1. relues中新建 https://www.io.com/v1/info  resBody://{appinfo.json}
+  2. values中直接新建appinfo文件, 把response的json直接复制进去修改即可
+
 ##### 本地服务器文件列表H5AI
 
 - docker 安装 H5AI
@@ -20,6 +34,11 @@
   4. 浏览器 输入 localhost查看
 
      > PWD:  /Users/用户名/h5ai   /h5ai: 新建文件夹用于存放需要共享的文件
+
+     > 重启电脑后如果需要重新启动   
+     >
+     > - docker ps -a
+     > - docker start xxxxxx(容器id)
 
 参考: [<https://hub.docker.com/r/clue/h5ai/>](<https://hub.docker.com/r/clue/h5ai/>)
 
@@ -37,9 +56,19 @@
 
 ​       [ConstraintLayout终极秘籍](<http://blog.chengyunfeng.com/?p=1030>)
 
-* CoordinatorLayout
+* CoordinatorLayout 
 
-  [CoordinatorLayout 完全解析](https://www.jianshu.com/p/4a77ae4cd82f)
+  CoordinatorLayout 完全解析](https://www.jianshu.com/p/4a77ae4cd82f) 
+
+  Android 详细分析AppBarLayout的五种ScrollFlags](https://www.jianshu.com/p/7caa5f4f49bd) 
+
+* CollapsingToolbarLayout 
+
+  
+
+* others 
+
+   
 
 ---
 
@@ -57,9 +86,7 @@
 
 [Android Router 从 0 到 1](<https://juejin.im/entry/5897a1c8128fe10058e76368>)
 
----
-
-#### Gradle
+#####  Gradle
 
 [gradel 属性详解官方文档](<https://google.github.io/android-gradle-dsl/current/com.android.build.gradle.BaseExtension.html>)
 
@@ -77,11 +104,7 @@
 
 [Transform 官方文档](<http://google.github.io/android-gradle-dsl/javadoc/> )
 
-
-
----
-
-#### View
+##### View
 
 [深入理解View知识系列一- setContentView和LayoutInflater源码原理分析](http://blog.csdn.net/yulong0809/article/details/79277574)
 
@@ -90,3 +113,10 @@
 [深入理解View知识系列三-Window机制、Canvas的由来、Android事件的由来](http://blog.csdn.net/yulong0809/article/details/79277633)
 
 [深入理解View知识系列四-View的测量规则以及三大方法流程](http://blog.csdn.net/yulong0809/article/details/79277667)
+
+
+
+##### 正则
+
+[正则表达式30分钟入门教程](<http://deerchao.net/tutorials/regex/regex.htm>)
+
