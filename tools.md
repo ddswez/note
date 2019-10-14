@@ -56,6 +56,8 @@
 
 ​       [ConstraintLayout终极秘籍](<http://blog.chengyunfeng.com/?p=1030>)
 
+​	[ConstraintLayout 完全解析 快来优化你的布局吧](<https://blog.csdn.net/lmj623565791/article/details/78011599>)
+
 * CoordinatorLayout 
 
   CoordinatorLayout 完全解析](https://www.jianshu.com/p/4a77ae4cd82f) 
@@ -119,4 +121,12 @@
 ##### 正则
 
 [正则表达式30分钟入门教程](<http://deerchao.net/tutorials/regex/regex.htm>)
+
+
+
+##### 疑难杂症  
+
+[Android Release 切换到后台再点桌面图标进入后, App 重启](<https://blog.csdn.net/stupid56862/article/details/82219554>)
+
+[解决Android应用第一次安装成功后Home键切到后台再点击桌面图标应用重启](<https://www.jianshu.com/p/9757ce0c69a5>)
 
