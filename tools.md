@@ -84,6 +84,8 @@
 
 [Android：这是一份全面 & 详细的Webview使用攻略](<https://www.jianshu.com/p/3c94ae673e2a>)
 
+[多层嵌套后的 Fragment 懒加载实现](https://juejin.im/post/5adcb0e36fb9a07aa7673fbc)
+
 ##### Router
 
 [Android Router 从 0 到 1](<https://juejin.im/entry/5897a1c8128fe10058e76368>)
@@ -128,5 +130,18 @@
 
 [Android Release 切换到后台再点桌面图标进入后, App 重启](<https://blog.csdn.net/stupid56862/article/details/82219554>)
 
-[解决Android应用第一次安装成功后Home键切到后台再点击桌面图标应用重启](<https://www.jianshu.com/p/9757ce0c69a5>)
+[解决Android应用第一次安装成功后Home键切到后台再点击桌面图标应用重启](<https://www.jianshu.com/p/9757ce0c69a5>). 
 
+
+
+
+
+---
+
+##### shell
+
+show abi:   
+
+>  adb shell getprop | grep cpu
+>
+>  adb shell getprop ro.product.cpu.abi
