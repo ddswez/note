@@ -31,10 +31,12 @@
 
   3. $ docker run -d -p 80:80 -v PWD :/var/www clue/h5ai
 
+     > 例如: docker run -d -p 80:80 -v /Users/just/h5ai:/var/www clue/h5ai
+
   4. 浏览器 输入 localhost查看
 
      > PWD:  /Users/用户名/h5ai   /h5ai: 新建文件夹用于存放需要共享的文件
-
+  
      > 重启电脑后如果需要重新启动   
      >
      > - docker ps -a
