@@ -44,7 +44,13 @@
 
 ##### websocket在线调试
 
-<http://coolaf.com/tool/chattest>
+<http://coolaf.com/tool/chattest>  
+
+##### 反编译打包
+
+ <https://juejin.im/post/6844904041466740749>
+
+
 
 ---
 
@@ -115,6 +121,8 @@
 [深入理解View知识系列三-Window机制、Canvas的由来、Android事件的由来](http://blog.csdn.net/yulong0809/article/details/79277633)
 
 [深入理解View知识系列四-View的测量规则以及三大方法流程](http://blog.csdn.net/yulong0809/article/details/79277667)
+
+[Android之Window和弹窗问题](https://juejin.im/post/6844903840030916615)
 
 
 

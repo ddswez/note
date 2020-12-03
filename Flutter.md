@@ -65,3 +65,8 @@ class B {
 
 ```
 
+[Add-to-app的MethodCallHandler不生效抛MissingPluginException解决](https://peterlpt.github.io/2020/04/25/flutter-configureFlutterEngine-not-invoke/)
+
+
+
+flutter pub cache repair  

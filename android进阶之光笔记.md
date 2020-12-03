@@ -53,7 +53,7 @@
    2. 判断控件是否可用
 
    3. 判断mOnTouchListener.onTouch(this, event)返回值
-     只要一个条件为false, 则调用onTouchEvent()
+       只要一个条件为false, 则调用onTouchEvent()
 
      编程思想: 在公司, 架构师搭好框架, 如果你感觉在onTouch中你的代码比他的要好
      (自己的业务逻辑), 则返回true, 也就不会再走onTouchEvent()方法, 如果感觉人家代码好
