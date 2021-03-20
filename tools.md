@@ -25,13 +25,13 @@
 
 - docker 安装 H5AI
 
-  1. 安装docker
+  1. 安装docker 
 
   2. $ docker pull clue/h5ai
 
-  3. $ docker run -d -p 80:80 -v PWD :/var/www clue/h5ai
+  3. $ docker run -d -p 80:80 -v ${PWD} :/var/www clue/h5ai
 
-     > 例如: docker run -d -p 80:80 -v /Users/just/h5ai:/var/www clue/h5ai
+     > 例如: docker run -d -p 80:80 -v /Users/用户名/h5ai:/var/www clue/h5ai
 
   4. 浏览器 输入 localhost查看
 

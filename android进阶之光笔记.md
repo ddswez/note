@@ -18,7 +18,7 @@
 
 可结合CollapsingToolbarLayout实现Toolbar的折叠效果  
 
-### 二. View体系和自定义View  
+## 二. View体系和自定义View
 
 #### 1.坐标系
 
